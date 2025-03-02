@@ -1,13 +1,14 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { eventId: string } }
+  req: NextRequest,
+  context: { params: Promise<{ eventId: string }> } // ✅ `params` es una promesa
 ) {
   try {
     const { userId } = await auth();
+    const { eventId } = await context.params; // ✅ Se usa `await` en `params`
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -15,7 +16,7 @@ export async function DELETE(
 
     const deletedEvent = await db.event.delete({
       where: {
-        id: params.eventId,
+        id: eventId,
       },
     });
 

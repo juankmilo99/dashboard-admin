@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Record<string, string> } // 🔥 Nueva forma en Next.js 15
+  context: { params: Promise<{ companyId: string }> } // ✅ params ahora es una Promesa
 ) {
   try {
     const { userId } = await auth();
@@ -14,7 +14,8 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const companyId = params.companyId; // ✅ Extrae correctamente companyId
+    // 🔥 Solución: Hacer `await` en `params`
+    const { companyId } = await context.params;
 
     if (!companyId) {
       return new NextResponse("Company ID is required", { status: 400 });
