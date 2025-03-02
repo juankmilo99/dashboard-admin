@@ -6,14 +6,12 @@ import { Header } from "./components/Header";
 import { CompanyInformation } from "./components/CompanyInformation";
 import { FooterCompany } from "./components/FooterCompany";
 
-// ✅ Define explícitamente el tipo de props
-interface PageProps {
-  params: { companyId: string };
-}
-
-export default async function CompanyIdPage({ params }: PageProps) {
-    const authData = await auth();
-    const userId = authData?.userId;
+export default async function CompanyIdPage({
+    params,
+}: {
+    params: Record<string, string>;
+}) {
+    const { userId } = await auth();
 
     if (!userId) {
         return redirect("/");
