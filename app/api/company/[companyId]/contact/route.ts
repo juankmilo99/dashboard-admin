@@ -2,10 +2,13 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { companyId: string } } // ✅ Forma correcta de obtener params en Next.js 15
-) {
+interface Context {
+  params?: {
+    companyId?: string;
+  };
+}
+
+export async function POST(req: NextRequest, context: Context) {
   try {
     const { userId } = await auth();
     const data = await req.json();
@@ -14,7 +17,11 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const companyId = params.companyId; // ✅ Extraemos correctamente el ID
+    // ✅ Validamos que `companyId` existe
+    const companyId = context.params?.companyId;
+    if (!companyId) {
+      return new NextResponse("Company ID is required", { status: 400 });
+    }
 
     const company = await db.company.findUnique({
       where: {
