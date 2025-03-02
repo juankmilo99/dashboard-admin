@@ -3,8 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-  req: NextRequest, 
-  { params }: { params: { companyId: string } }
+  req: NextRequest,
+  { params }: { params: Record<string, string> } // 🔥 Nueva forma en Next.js 15
 ) {
   try {
     const { userId } = await auth();
@@ -14,13 +14,15 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!params.companyId) {
+    const companyId = params.companyId; // ✅ Extrae correctamente companyId
+
+    if (!companyId) {
       return new NextResponse("Company ID is required", { status: 400 });
     }
 
     const company = await db.company.findUnique({
       where: {
-        id: params.companyId,
+        id: companyId,
       },
     });
 
@@ -30,7 +32,7 @@ export async function POST(
 
     const contact = await db.contact.create({
       data: {
-        companyId: params.companyId,
+        companyId,
         ...data,
       },
     });
