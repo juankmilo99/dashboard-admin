@@ -1,3 +1,6 @@
+type PageProps = {
+    params: { companyId: string };
+};
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -5,11 +8,7 @@ import { Header } from "./components/Header";
 import { CompanyInformation } from "./components/CompanyInformation";
 import { FooterCompany } from "./components/FooterCompany";
 
-type Params = { companyId: string }; // Define el tipo explícitamente
-
-export default async function CompanyIdPage({
-    params,
-}: { params: Params }) {
+export default async function CompanyIdPage({ params }: PageProps) {
     const { userId } = await auth();
 
     if (!userId) {
