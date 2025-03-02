@@ -2,10 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { companyId: string } }
-) {
+export async function POST(req: Request, context: { params: { companyId: string } }) {
   try {
     const { userId } = await auth();
     const data = await req.json();
@@ -14,9 +11,11 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const companyId = context.params.companyId; // ✅ Extrae correctamente los params
+
     const company = await db.company.findUnique({
       where: {
-        id: params.companyId,
+        id: companyId,
       },
     });
 
@@ -26,7 +25,7 @@ export async function POST(
 
     const contact = await db.contact.create({
       data: {
-        companyId: params.companyId,
+        companyId: companyId,
         ...data,
       },
     });
