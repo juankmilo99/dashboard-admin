@@ -1,12 +1,19 @@
-import { db } from "@/lib/db"
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
+import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-import { Header } from "./components/Header"
-import { CompanyInformation } from "./components/CompanyInformation"
-import { FooterCompany } from "./components/FooterCompany"
+import { Header } from "./components/Header";
+import { CompanyInformation } from "./components/CompanyInformation";
+import { FooterCompany } from "./components/FooterCompany";
 
-export default async function CompanyIdPage({ params }: { params: Record<string, string> }) {
+// ✅ Definimos el tipo manualmente
+interface CompanyIdPageProps {
+  params: {
+    companyId: string;
+  };
+}
+
+export default async function CompanyIdPage({ params }: CompanyIdPageProps) {
     const authData = await auth();
     const userId = authData?.userId;
 
@@ -17,8 +24,8 @@ export default async function CompanyIdPage({ params }: { params: Record<string,
     const company = await db.company.findUnique({
         where: {
             id: params.companyId,
-            userId
-        }
+            userId,
+        },
     });
 
     if (!company) {
