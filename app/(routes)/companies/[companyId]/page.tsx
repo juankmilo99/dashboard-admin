@@ -7,11 +7,18 @@ import { CompanyInformation } from "./components/CompanyInformation"
 import { FooterCompany } from "./components/FooterCompany"
 
 
-export default async function CompanyIdPage({ params }: { params: { companyId: string } }) {
-    const { userId } = await auth()
+interface CompanyIdPageProps {
+    params: {
+        companyId: string;
+    };
+}
+
+export default async function CompanyIdPage({ params }: CompanyIdPageProps) {
+    const authData = await auth(); // Evitar desestructuración directa
+    const userId = authData?.userId;
 
     if (!userId) {
-        return redirect("/")
+        return redirect("/");
     }
 
 
