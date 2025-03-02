@@ -8,16 +8,19 @@ import { Header } from "./components/Header";
 import { CompanyInformation } from "./components/CompanyInformation";
 import { FooterCompany } from "./components/FooterCompany";
 
-export default async function CompanyIdPage({ params }: PageProps) {
-    const { userId } = await auth();
 
+export default async function CompanyIdPage(props: PageProps) {
+    const { params } = props; // Extraer `params` explícitamente
+    const companyId = params.companyId; // Asegurar que `companyId` es string
+
+    const { userId } = await auth();
     if (!userId) {
         return redirect("/");
     }
 
     const company = await db.company.findUnique({
         where: {
-            id: params.companyId,
+            id: companyId,
             userId,
         },
     });
