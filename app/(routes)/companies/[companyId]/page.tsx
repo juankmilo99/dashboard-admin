@@ -1,17 +1,19 @@
-type PageProps = {
-    params: { companyId: string };
-};
-import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { Header } from "./components/Header";
-import { CompanyInformation } from "./components/CompanyInformation";
-import { FooterCompany } from "./components/FooterCompany";
+import { db } from "@/lib/db"
+import { auth } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
+
+import { Header } from "./components/Header"
+import { CompanyInformation } from "./components/CompanyInformation"
+import { FooterCompany } from "./components/FooterCompany"
 
 
-export default async function CompanyIdPage(props: PageProps) {
-    const { params } = props; // Extraer `params` explícitamente
-    const companyId = params.companyId; // Asegurar que `companyId` es string
+export default async function CompanyIdPage({ params }: { params: Promise<{ companyId: string }> }) {
+    const resolvedParams = await params; // 👈 Esperar a que params se resuelva
+
+    if (!resolvedParams || typeof resolvedParams.companyId !== "string") {
+        console.error("Error: params is not valid", resolvedParams);
+        return redirect("/");
+    }
 
     const { userId } = await auth();
     if (!userId) {
@@ -20,7 +22,7 @@ export default async function CompanyIdPage(props: PageProps) {
 
     const company = await db.company.findUnique({
         where: {
-            id: companyId,
+            id: resolvedParams.companyId, // 👈 Usar los params ya resueltos
             userId,
         },
     });
@@ -37,3 +39,4 @@ export default async function CompanyIdPage(props: PageProps) {
         </div>
     );
 }
+
