@@ -6,31 +6,23 @@ import { Header } from "./components/Header"
 import { CompanyInformation } from "./components/CompanyInformation"
 import { FooterCompany } from "./components/FooterCompany"
 
-
-interface CompanyIdPageProps {
-    params: {
-        companyId: string;
-    };
-}
-
-export default async function CompanyIdPage({ params }: CompanyIdPageProps) {
-    const authData = await auth(); // Evitar desestructuración directa
+export default async function CompanyIdPage({ params }: { params: Record<string, string> }) {
+    const authData = await auth();
     const userId = authData?.userId;
 
     if (!userId) {
         return redirect("/");
     }
 
-
     const company = await db.company.findUnique({
         where: {
             id: params.companyId,
             userId
         }
-    })
+    });
 
     if (!company) {
-        return redirect("/")
+        return redirect("/");
     }
 
     return (
@@ -39,5 +31,5 @@ export default async function CompanyIdPage({ params }: CompanyIdPageProps) {
             <CompanyInformation company={company} />
             <FooterCompany companyId={company.id} />
         </div>
-    )
+    );
 }
