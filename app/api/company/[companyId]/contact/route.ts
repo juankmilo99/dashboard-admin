@@ -2,13 +2,10 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-interface Context {
-  params?: {
-    companyId?: string;
-  };
-}
-
-export async function POST(req: NextRequest, context: Context) {
+export async function POST(
+  req: NextRequest, 
+  { params }: { params: { companyId: string } }
+) {
   try {
     const { userId } = await auth();
     const data = await req.json();
@@ -17,15 +14,13 @@ export async function POST(req: NextRequest, context: Context) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // ✅ Validamos que `companyId` existe
-    const companyId = context.params?.companyId;
-    if (!companyId) {
+    if (!params.companyId) {
       return new NextResponse("Company ID is required", { status: 400 });
     }
 
     const company = await db.company.findUnique({
       where: {
-        id: companyId,
+        id: params.companyId,
       },
     });
 
@@ -35,7 +30,7 @@ export async function POST(req: NextRequest, context: Context) {
 
     const contact = await db.contact.create({
       data: {
-        companyId,
+        companyId: params.companyId,
         ...data,
       },
     });
